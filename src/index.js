@@ -1,5 +1,7 @@
 const { app, BrowserWindow, ipcMain} = require('electron');
-const path = require("path")
+const path = require("path");
+const util = require('util');
+
 const {doJSModification} = require("./intercept");
 
 app.commandLine.appendSwitch('--disable-gpu-sandbox');
@@ -83,14 +85,22 @@ ipcMain.on("receive-message", (event, msg) => {
   console.log("receive")
   console.log(msg)
 
-  if(msg.command === "X-MUL"){
-    for(let message of msg.command.items){
+  if(msg.command == "X-MUL"){
+    for(let message of msg.items){
       console.log(message)
     }
   }
   else{
-    console.log(message)
+    console.log(msg)
   }
+
+  try{
+    console.log(msg.command.data.frames||"") 
+  } catch (e) {
+
+  }
+
+
 })
 
 // This method will be called when Electron has finished
