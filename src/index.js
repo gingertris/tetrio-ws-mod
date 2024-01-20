@@ -81,27 +81,25 @@ ipcMain.on("send-message", (event, msg) => {
   console.log(msg)
 })
 
+const receiveMessage = (msg) => {
+  console.log(util.inspect(msg, false, null, true))
+}
+
 ipcMain.on("receive-message", (event, msg) => {
   console.log("receive")
-  console.log(msg)
 
   if(msg.command == "X-MUL"){
     for(let message of msg.items){
-      console.log(message)
+      receiveMessage(message);
     }
   }
   else{
-    console.log(msg)
+    receiveMessage(msg);
   }
 
-  try{
-    console.log(msg.command.data.frames||"") 
-  } catch (e) {
-
-  }
+});
 
 
-})
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
