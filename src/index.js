@@ -82,6 +82,15 @@ ipcMain.on("send-message", (event, msg) => {
 ipcMain.on("receive-message", (event, msg) => {
   console.log("receive")
   console.log(msg)
+
+  if(msg.command === "X-MUL"){
+    for(let message of msg.command.items){
+      console.log(message)
+    }
+  }
+  else{
+    console.log(message)
+  }
 })
 
 // This method will be called when Electron has finished
