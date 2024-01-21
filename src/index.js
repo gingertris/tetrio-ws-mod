@@ -82,7 +82,7 @@ ipcMain.on("send-message", (event, msg) => {
 })
 
 const receiveMessage = (msg) => {
-  console.log(util.inspect(msg, false, null, true))
+  console.log(util.inspect(msg, false, null, false))
 }
 
 ipcMain.on("receive-message", (event, msg) => {
