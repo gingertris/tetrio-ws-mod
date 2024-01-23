@@ -102,8 +102,11 @@ ipcMain.on("receive-message", (event, msg) => {
 
 });
 
-ribbonHandler.on("leaderboard", (leaderboard)=>{
+ribbonHandler.on("match:leaderboard", (leaderboard)=>{
   console.log(util.inspect(leaderboard, true, null, true));
+})
+ribbonHandler.on("match:referee", (referee)=>{
+  console.log(util.inspect(referee, true, null, true));
 })
 
 

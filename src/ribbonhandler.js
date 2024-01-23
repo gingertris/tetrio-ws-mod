@@ -33,8 +33,11 @@ module.exports = class RibbonHandler extends EventEmitter {
                 this.setGameids(msg.data.players);
                 break;
             case "game.match":
+                this.updateLeaderboard(msg.data.leaderboard, false);
+                this.updateReferee(msg.data.refereedata);
+                break;
             case "game.score":
-                this.updateLeaderboard(msg.data.leaderboard);
+                this.updateLeaderboard(msg.data.leaderboard, true);
                 this.updateReferee(msg.data.refereedata);
                 break;
         }
@@ -47,14 +50,14 @@ module.exports = class RibbonHandler extends EventEmitter {
         }
     }
 
-    updateLeaderboard(leaderboard){
+    updateLeaderboard(leaderboard, scoreUpdate){
         this.game.leaderboard = leaderboard;
-        this.emit("leaderboard", leaderboard);
+        this.emit(scoreUpdate ? "match:scoreupdate" : "match:leaderboard", leaderboard);
     }
 
     updateReferee(referee){
         this.game.referee = referee;
-        this.emit("referee", referee);
+        this.emit("match:referee", referee);
     }
 
     
