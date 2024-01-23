@@ -1,5 +1,4 @@
 import {Packr, Unpackr} from "msgpackr";
-import {RibbonIDdMessage, RibbonMessage} from "../types/RibbonMessage";
 
 const PACKET_TYPE_STANDARD = 0x45;
 const PACKET_TYPE_EXTRACTED_ID = 0xAE;

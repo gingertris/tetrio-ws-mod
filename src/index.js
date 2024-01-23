@@ -4,6 +4,9 @@ const util = require('util');
 
 const {doJSModification} = require("./intercept");
 
+const RibbonHandler = require('./ribbonhandler');
+const ribbonHandler = new RibbonHandler();
+
 app.commandLine.appendSwitch('--disable-gpu-sandbox');
 app.commandLine.appendSwitch('--enable-webgl2-compute-context');
 app.commandLine.appendSwitch('--lang', 'en-US');
@@ -77,17 +80,17 @@ const createWindow = () => {
 };
 
 ipcMain.on("send-message", (event, msg) => {
-  console.log("send")
-  console.log(msg)
+  //console.log("send")
+  //console.log(msg)
 })
 
 const receiveMessage = (msg) => {
-  console.log(util.inspect(msg, false, null, false))
+  //console.log(util.inspect(msg, false, null, false))
+  ribbonHandler.handleMessage(msg);
 }
 
 ipcMain.on("receive-message", (event, msg) => {
-  console.log("receive")
-
+  
   if(msg.command == "X-MUL"){
     for(let message of msg.items){
       receiveMessage(message);
@@ -98,6 +101,10 @@ ipcMain.on("receive-message", (event, msg) => {
   }
 
 });
+
+ribbonHandler.on("leaderboard", (leaderboard)=>{
+  console.log(util.inspect(leaderboard, true, null, true));
+})
 
 
 
