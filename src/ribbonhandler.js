@@ -24,21 +24,33 @@ module.exports = class RibbonHandler extends EventEmitter {
 
     _handleGameMessage(msg){
         switch(msg.command){
+            case "game.start":
+                this.emit("game:start");
+                break;
             case "game.spectate":
-                this.setGameids(msg.data.players);
-                this.updateLeaderboard(msg.data.match.leaderboard);
-                this.updateReferee(msg.data.match.refereedata);
+                this.game.players=msg.data.players;
+                this.updateMatch(msg.data.match);
+                this.emit("game:match_state", this.game.match)
                 break;         
             case "game.ready":
+                this.game.players = msg.data.players;
                 this.setGameids(msg.data.players);
                 break;
+            case "game.advance":
+                this.emit("game:advance");
+                break;
             case "game.match":
-                this.updateLeaderboard(msg.data.leaderboard, false);
-                this.updateReferee(msg.data.refereedata);
+                this.updateMatch(msg.data);
+                this.emit("game:match_state", this.game.match)
                 break;
             case "game.score":
-                this.updateLeaderboard(msg.data.leaderboard, true);
-                this.updateReferee(msg.data.refereedata);
+
+                this.emit("game:score_transition", {victor: msg.data.victor})
+                break;
+            case "game.end":
+                this.game.match.leaderboard = msg.data.leaderboard;
+                this.emit("game:match_state", this.game.match);
+                this.emit("game:end")
                 break;
         }
         
@@ -50,15 +62,16 @@ module.exports = class RibbonHandler extends EventEmitter {
         }
     }
 
-    updateLeaderboard(leaderboard, scoreUpdate){
-        this.game.leaderboard = leaderboard;
-        this.emit(scoreUpdate ? "match:scoreupdate" : "match:leaderboard", leaderboard);
+    updateMatch(data){
+        console.log(data)
+        this.game.match.leaderboard = data.leaderboard.sort((a,b) => {
+            return a.naturalorder - b.naturalorder
+        });
+        this.game.match.refereedata = data.refereedata;
     }
 
-    updateReferee(referee){
-        this.game.referee = referee;
-        this.emit("match:referee", referee);
-    }
+    
+
 
     
 

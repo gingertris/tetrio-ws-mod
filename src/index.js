@@ -85,7 +85,7 @@ ipcMain.on("send-message", (event, msg) => {
 })
 
 const receiveMessage = (msg) => {
-  //console.log(util.inspect(msg, false, null, false))
+  if(!msg.command.includes("replay") && msg.command.includes("game")) console.log(msg.command);
   ribbonHandler.handleMessage(msg);
 }
 
@@ -102,12 +102,52 @@ ipcMain.on("receive-message", (event, msg) => {
 
 });
 
-ribbonHandler.on("match:leaderboard", (leaderboard)=>{
-  console.log(util.inspect(leaderboard, true, null, true));
+//websocket server
+const ws = require("ws");
+
+const wss = new ws.WebSocketServer({
+    port:31462
+});
+
+wss.on('connection', ws => {
+  console.log("client connected");
+  ws.send(JSON.stringify({
+    event: "game:match_state",
+    data: ribbonHandler.game.match
+  }));
 })
-ribbonHandler.on("match:referee", (referee)=>{
-  console.log(util.inspect(referee, true, null, true));
+
+wss.on("error", (error) => {
+  console.log(error)
 })
+
+const broadcast = (event, data = null) => {
+  for (let client of wss.clients){
+    if (client.readyState === ws.WebSocket.OPEN) client.send(JSON.stringify({
+      event, data
+    }));
+  }
+}
+
+ribbonHandler.on("game:start", () => {
+  broadcast("game:start")
+})
+ribbonHandler.on("game:advance",  () => {
+  broadcast("game:advance");
+  //console.log(util.inspect(leaderboard, true, null, true));
+})
+ribbonHandler.on("game:score_transition", (msg) => {
+  broadcast("game:score_transition", JSON.stringify(msg))
+})
+ribbonHandler.on("game:match_state", msg => {
+  console.log(msg)
+  broadcast("game:match_state", JSON.stringify(msg));
+  //console.log(util.inspect(referee, true, null, true));
+})
+ribbonHandler.on("game:end", () => {
+  broadcast("game:end")
+})
+
 
 
 

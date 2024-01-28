@@ -1,0 +1,29 @@
+
+<div id="messages"></div>
+
+<script>
+    let ws;
+
+    const open = (uri) => {
+        ws = new WebSocket(uri);
+        ws.onopen = (e) => {
+            console.log("websocket opened");
+        }
+        ws.onerror = (e) => {
+            console.log("websocket error, closing");
+            ws.close()
+        }
+        ws.onclose = (e) => {
+            console.log("websocket closed, attempting to reconnect");
+            setTimeout(() => open(uri), 1000);
+        }
+        ws.onmessage = (e) => {
+            console.log(e);
+            const message = JSON.parse(e.data);
+            
+            document.getElementById("messages").innerHTML += `<p><code>${JSON.stringify(message, null, 2)}</code><p>`
+        }
+    }
+
+    open("ws://localhost:31462")
+</script>
