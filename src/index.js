@@ -140,7 +140,7 @@ ribbonHandler.on("game:score_transition", (msg) => {
   broadcast("game:score_transition", msg)
 })
 ribbonHandler.on("game:match_state", msg => {
-  console.log(msg)
+  //console.log(msg)
   broadcast("game:match_state", msg);
   //console.log(util.inspect(referee, true, null, true));
 })
