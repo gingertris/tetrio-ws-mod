@@ -1,5 +1,8 @@
 
-<div id="messages"></div>
+<div>
+    <h2 id="matchname">title</h2>
+    <p id="score">score</p>
+</div>
 
 <script>
     let ws;
@@ -20,8 +23,14 @@
         ws.onmessage = (e) => {
             console.log(e);
             const message = JSON.parse(e.data);
+            console.log(message)
+
+            if(message.event =="game:match_state"){
+                document.querySelector("#matchname").innerHTML = `${message.data.refereedata.modename} FT${message.data.refereedata.ft} WB${message.data.refereedata.wb}`
+                document.querySelector("#score").innerHTML = `${message.data.leaderboard[0].username} ${message.data.leaderboard[0].wins} - ${message.data.leaderboard[1].wins} ${message.data.leaderboard[1].username }  `
             
-            document.getElementById("messages").innerHTML += `<p><code>${JSON.stringify(message, null, 2)}</code><p>`
+            }
+
         }
     }
 

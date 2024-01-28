@@ -48,9 +48,10 @@ module.exports = class RibbonHandler extends EventEmitter {
                 this.emit("game:score_transition", {victor: msg.data.victor})
                 break;
             case "game.end":
-                this.game.match.leaderboard = msg.data.leaderboard;
+                this.updateMatch(msg.data)
                 this.emit("game:match_state", this.game.match);
-                this.emit("game:end")
+                const victor = this.game.match.leaderboard.filter((a) => a.success === true)[0].username;
+                this.emit("game:end", {victor})
                 break;
         }
         
@@ -63,7 +64,7 @@ module.exports = class RibbonHandler extends EventEmitter {
     }
 
     updateMatch(data){
-        console.log(data)
+        //console.log(data)
         this.game.match.leaderboard = data.leaderboard.sort((a,b) => {
             return a.naturalorder - b.naturalorder
         });

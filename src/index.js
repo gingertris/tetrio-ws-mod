@@ -137,11 +137,11 @@ ribbonHandler.on("game:advance",  () => {
   //console.log(util.inspect(leaderboard, true, null, true));
 })
 ribbonHandler.on("game:score_transition", (msg) => {
-  broadcast("game:score_transition", JSON.stringify(msg))
+  broadcast("game:score_transition", msg)
 })
 ribbonHandler.on("game:match_state", msg => {
   console.log(msg)
-  broadcast("game:match_state", JSON.stringify(msg));
+  broadcast("game:match_state", msg);
   //console.log(util.inspect(referee, true, null, true));
 })
 ribbonHandler.on("game:end", () => {
