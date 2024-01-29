@@ -6,4 +6,5 @@ const {contextBridge, ipcRenderer} = require("electron/renderer");
 contextBridge.exposeInMainWorld("modribbon", {
     sendMessage: msg => ipcRenderer.send("send-message", msg),
     receiveMessage: msg => ipcRenderer.send("receive-message", msg)
-})
+});
+

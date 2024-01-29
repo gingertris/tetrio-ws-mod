@@ -1,6 +1,6 @@
 const {contextBridge, ipcRenderer} = require("electron/renderer");
 
 contextBridge.exposeInMainWorld("config", {
-    getConfig: key => ipcRenderer.send("get-config", key),
-    setConfig: (key, value) => ipcRenderer.send("set-config", (key, value))
+    toggleUI: (isHidden) => ipcRenderer.send("toggle-ui", isHidden),
+    toggleTransparent: (isTransparent) => ipcRenderer.send("toggle-transparent", isTransparent)
 })

@@ -8,21 +8,31 @@
   <body>
     <fieldset>
         <legend>User Interface</legend>
-        <label title="Hide UI">
+        <div>
+          <label title="Hide UI">
             <input type="checkbox" id="hideui" />
             Hide UI
-        </label>
-        
-        Hide UI
+          </label>
+        </div>
+
+        <div>
+          <label title="Hide UI">
+            <input type="checkbox" id="transparent" />
+            Transparent Background
+          </label>
+        </div>
+ 
     </fieldset>
 
     <script>
         const hideUItoggle = document.querySelector("#hideui");
-        if(config.getConfig("hideUI")){
-            hideUItoggle.checked = true;
-        }
         hideUItoggle.addEventListener("change", (event) => {
-            config.setConfig("hideUI", hideUItoggle.checked)
+            config.toggleUI(hideUItoggle.checked)
+        })
+
+        const transparentToggle = document.querySelector("#transparent");
+        hideUItoggle.addEventListener("change", (event) => {
+            config.toggleTransparent(transparentToggle.checked)
         })
     </script>
 

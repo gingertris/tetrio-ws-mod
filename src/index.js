@@ -1,18 +1,14 @@
 const { app, BrowserWindow, ipcMain} = require('electron');
 const path = require("path");
 const util = require('util');
-const Store = require("electron-store");
 
 const {doJSModification} = require("./lib/intercept");
 
 const RibbonHandler = require('./lib/ribbonhandler');
 const ribbonHandler = new RibbonHandler();
 
-const config = new Store({
-  defaults:{
-    hideUI: false
-  }
-});
+let mainWindow;
+let cssKey;
 
 app.commandLine.appendSwitch('--disable-gpu-sandbox');
 app.commandLine.appendSwitch('--enable-webgl2-compute-context');
@@ -38,13 +34,14 @@ const createWindows = () => {
 }
 
 const createMainWindow = () => {
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1366,
     height: 768,
     title: "WebSocket Mod",
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
-    }
+    },
+    transparent:true
   });
   
   mainWindow.setMenu(null);
@@ -87,7 +84,9 @@ const createMainWindow = () => {
   });
 
   // Open the DevTools.
-  //mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
+
+
 };
 
 const createConfigWindow = () => {
@@ -106,7 +105,7 @@ const createConfigWindow = () => {
 }
 
 const receiveMessage = (msg) => {
-  if(!msg.command.includes("replay") && msg.command.includes("game")) console.log(msg.command);
+  //if(!msg.command.includes("replay") && msg.command.includes("game")) console.log(msg.command);
   ribbonHandler.handleMessage(msg);
 }
 
@@ -115,12 +114,30 @@ ipcMain.on("send-message", (event, msg) => {
   //console.log(msg)
 })
 
-ipcMain.on("get-config", (event, key) => {
-  event.returnValue = config.get(key);
+ipcMain.on("toggle-ui", (event, isHidden) => {
+  console.log(`toggle-ui - ${isHidden}`)
+  if(isHidden){
+    hideUI()
+  } else{
+    showUI()
+  }
 })
-ipcMain.on("set-config", (event, {key, value}) => {
-  config.set(key, value);
+
+ipcMain.on("toggle-transparent", (event, isTransparent) => {
+
 })
+
+const hideUI = async () => {
+  cssKey = await mainWindow.webContents.insertCSS(`
+    div {
+      display: none;
+    }
+  `)
+}
+
+const showUI = () => {
+  mainWindow.webContents.removeInsertedCSS(cssKey);
+}
 
 ipcMain.on("receive-message", (event, msg) => {
   
