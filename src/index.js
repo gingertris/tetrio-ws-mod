@@ -1,11 +1,18 @@
 const { app, BrowserWindow, ipcMain} = require('electron');
 const path = require("path");
 const util = require('util');
+const Store = require("electron-store");
 
-const {doJSModification} = require("./intercept");
+const {doJSModification} = require("./lib/intercept");
 
-const RibbonHandler = require('./ribbonhandler');
+const RibbonHandler = require('./lib/ribbonhandler');
 const ribbonHandler = new RibbonHandler();
+
+const config = new Store({
+  defaults:{
+    hideUI: false
+  }
+});
 
 app.commandLine.appendSwitch('--disable-gpu-sandbox');
 app.commandLine.appendSwitch('--enable-webgl2-compute-context');
@@ -22,8 +29,15 @@ if (require('electron-squirrel-startup')) {
   app.quit();
 }
 
-const createWindow = () => {
+const createWindows = () => {
   // Create the browser window.
+  createMainWindow();
+  createConfigWindow();
+
+
+}
+
+const createMainWindow = () => {
   const mainWindow = new BrowserWindow({
     width: 1366,
     height: 768,
@@ -33,13 +47,10 @@ const createWindow = () => {
     }
   });
   
-
   mainWindow.setMenu(null);
 
   // and load the index.html of the app.
   mainWindow.loadURL("https://tetr.io");
-
-  
 
   // block enthusiast gaming ad network
   mainWindow.webContents.session.webRequest.onBeforeSendHeaders({
@@ -76,18 +87,40 @@ const createWindow = () => {
   });
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  //mainWindow.webContents.openDevTools();
 };
+
+const createConfigWindow = () => {
+  const configWindow = new BrowserWindow({
+    width:600,
+    height:800,
+    title: "WebSocket Mod Config",
+    webPreferences: {
+      preload: path.join(__dirname, 'preloadconfig.js')
+    }
+  });
+
+  configWindow.setMenu(null);
+  configWindow.webContents.loadFile(path.join(__dirname, "config.html"));
+
+}
+
+const receiveMessage = (msg) => {
+  if(!msg.command.includes("replay") && msg.command.includes("game")) console.log(msg.command);
+  ribbonHandler.handleMessage(msg);
+}
 
 ipcMain.on("send-message", (event, msg) => {
   //console.log("send")
   //console.log(msg)
 })
 
-const receiveMessage = (msg) => {
-  if(!msg.command.includes("replay") && msg.command.includes("game")) console.log(msg.command);
-  ribbonHandler.handleMessage(msg);
-}
+ipcMain.on("get-config", (event, key) => {
+  event.returnValue = config.get(key);
+})
+ipcMain.on("set-config", (event, {key, value}) => {
+  config.set(key, value);
+})
 
 ipcMain.on("receive-message", (event, msg) => {
   
@@ -154,7 +187,7 @@ ribbonHandler.on("game:end", () => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow);
+app.on('ready', createWindows);
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
@@ -169,7 +202,7 @@ app.on('activate', () => {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
+    createWindows();
   }
 });
 

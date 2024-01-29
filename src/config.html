@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>WebSocket Mod Config</title>
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <fieldset>
+        <legend>User Interface</legend>
+        <label title="Hide UI">
+            <input type="checkbox" id="hideui" />
+            Hide UI
+        </label>
+        
+        Hide UI
+    </fieldset>
+
+    <script>
+        const hideUItoggle = document.querySelector("#hideui");
+        if(config.getConfig("hideUI")){
+            hideUItoggle.checked = true;
+        }
+        hideUItoggle.addEventListener("change", (event) => {
+            config.setConfig("hideUI", hideUItoggle.checked)
+        })
+    </script>
+
+  </body>
+</html>
